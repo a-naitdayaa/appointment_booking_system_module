@@ -1,0 +1,11 @@
+appointment_entity.settings.tab:
+  title: 'Overview'
+  route_name: appointment_entity.settings
+  base_route: appointment_entity.settings
+  weight: -10
+
+agency_entity.settings.tab:
+  title: 'Overview'
+  route_name: agency_entity.settings
+  base_route: agency_entity.settings
+  weight: -10

@@ -1,0 +1,80 @@
+<?php
+
+declare(strict_types=1);
+
+use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\user\Entity\Role;
+
+/**
+ * Implements hook_install().
+ */
+function appointment_install() : void
+{
+  appointment_create_vocabulary();
+
+  appointment_create_terms();
+
+  _appointment_create_roles();
+
+}
+
+// -------------------------------------------
+// 1 Create the adviser role if it doesn't exist
+// -------------------------------------------
+function _appointment_create_roles(): void {
+  if (!Role::load('adviser')) {
+    Role::create([
+      'id'    => 'adviser',
+      'label' => 'Adviser',
+    ])->save();
+  }
+}
+
+// -------------------------------------------
+// 3 Create the specializations vocabulary
+// -------------------------------------------
+function appointment_create_vocabulary() : void
+{
+  if(!Vocabulary::load('appointment_type')) {
+    $vocabulary = Vocabulary::create([
+      'vid' => 'appointment_type',
+      'description' => 'The type of appointment',
+      'name' => 'Appointment Type',
+    ]);
+    $vocabulary->save();
+  }
+}
+
+// -------------------------------------------
+// 4 Creating the specializations vocabulary terms
+// -------------------------------------------
+function appointment_create_terms(): void
+{
+  $terms = [
+    'Career Counseling',
+    'Financial Advice',
+    'Legal Consultation',
+    'Educational Guidance',
+    'Health Services',
+    'Housing Assistance',
+    'Employment Services',
+    'Immigration Services'
+  ];
+
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+
+  foreach ($terms as $term_name) {
+    $existing_terms = $term_storage->loadByProperties([
+      'name' => $term_name,
+      'vid' => 'appointment_type',
+    ]);
+
+    if (empty($existing_terms)) {
+      $term_storage->create([
+        'name' => $term_name,
+        'vid' => 'appointment_type',
+      ])->save();
+    }
+  }
+}
+

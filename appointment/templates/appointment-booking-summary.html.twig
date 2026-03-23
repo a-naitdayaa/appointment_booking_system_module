@@ -1,0 +1,68 @@
+{#
+/**
+ * @file
+ * Template: appointment-booking-summary.html.twig
+ *
+ * Variables:
+ *   - customer_name
+ *   - customer_email
+ *   - customer_phone
+ *   - agency
+ *   - specialization
+ *   - adviser
+ *   - date
+ *   - hour
+ */
+#}
+
+<div class="booking-confirm__wrapper">
+
+  <div class="booking-confirm__summary">
+    <h3 class="booking-section__title">{{ 'Personal information'|t }}</h3>
+
+    <div class="booking-confirm__row">
+      <span class="booking-confirm__label">{{ 'Full name'|t }}</span>
+      <span class="booking-confirm__value">{{ customer_name ?: '—' }}</span>
+    </div>
+
+    <div class="booking-confirm__row">
+      <span class="booking-confirm__label">{{ 'Email'|t }}</span>
+      <span class="booking-confirm__value">{{ customer_email ?: '—' }}</span>
+    </div>
+
+    <div class="booking-confirm__row">
+      <span class="booking-confirm__label">{{ 'Phone'|t }}</span>
+      <span class="booking-confirm__value">{{ customer_phone ?: '—' }}</span>
+    </div>
+  </div>
+
+  <div class="booking-confirm__summary">
+    <h3 class="booking-section__title">{{ 'Appointment'|t }}</h3>
+
+    <div class="booking-confirm__row">
+      <span class="booking-confirm__label">{{ 'Agency'|t }}</span>
+      <span class="booking-confirm__value">{{ agency ?: '—' }}</span>
+    </div>
+
+    <div class="booking-confirm__row">
+      <span class="booking-confirm__label">{{ 'Specialization'|t }}</span>
+      <span class="booking-confirm__value">{{ specialization ?: '—' }}</span>
+    </div>
+
+    <div class="booking-confirm__row">
+      <span class="booking-confirm__label">{{ 'Adviser'|t }}</span>
+      <span class="booking-confirm__value">{{ adviser ?: '—' }}</span>
+    </div>
+
+    <div class="booking-confirm__row">
+      <span class="booking-confirm__label">{{ 'Date'|t }}</span>
+      <span class="booking-confirm__value">{{ date ?: '—' }}</span>
+    </div>
+
+    <div class="booking-confirm__row">
+      <span class="booking-confirm__label">{{ 'Time'|t }}</span>
+      <span class="booking-confirm__value">{{ hour ?: '—' }}</span>
+    </div>
+  </div>
+
+</div>

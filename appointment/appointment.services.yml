@@ -1,0 +1,4 @@
+services:
+  appointment.csv_exporter:
+    class: Drupal\appointment\Service\AppointmentCsvExporter
+    arguments: ['@entity_type.manager']

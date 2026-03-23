@@ -1,0 +1,32 @@
+appointment_entity.settings:
+  path: '/admin/config/appointment'
+  defaults:
+    _controller: 'Drupal\appointment\Controller\AppointmentSettingController::settingsPage'
+    _title: 'Appointment'
+  requirements:
+    _permission: 'administer appointment entities'
+
+agency_entity.settings:
+  path: '/admin/config/agency'
+  defaults:
+    _controller: 'Drupal\appointment\Controller\AgencySettingController::settingsPage'
+    _title: 'Agencies'
+  requirements:
+    _permission: 'administer agency entities'
+
+appointment_entity.booking_form:
+  path: '/appointment/booking-an-appointment'
+  defaults:
+      _form: 'Drupal\appointment\Form\AppointmentBookingForm'
+      _title: 'Book an Appointment'
+  requirements:
+      _permission: 'add appointment entities'
+
+# This route is used for the CSV export of appointments.
+appointment.export_csv:
+  path: '/admin/structure/appointments/export-csv'
+  defaults:
+    _controller: '\Drupal\appointment\Controller\AppointmentExportController::exportCsv'
+    _title: 'Export Appointments CSV'
+  requirements:
+    _permission: 'administer appointment entities'

@@ -1,0 +1,33 @@
+'administer appointment entities':
+    title: 'Administer appointment entities'
+    description: 'Allows users to administer appointment entities.'
+'view appointment entities':
+    title: 'View appointment entities'
+    description: 'Allows users to view appointment entities.'
+'add appointment entities':
+    title: 'Add appointment entities'
+    description: 'Allows users to add appointment entities.'
+'edit appointment entities':
+    title: 'Edit appointment entities'
+    description: 'Allows users to edit appointment entities.'
+'delete appointment entities':
+    title: 'Delete appointment entities'
+    description: 'Allows users to delete appointment entities.'
+
+
+
+'administer agency entities':
+    title: 'Administer agency entities'
+    description: 'Allows users to administer agency entities.'
+'view agency entities':
+    title: 'View agency entities'
+    description: 'Allows users to view agency entities.'
+'add agency entities':
+    title: 'Add agency entities'
+    description: 'Allows users to add agency entities.'
+'edit agency entities':
+    title: 'Edit agency entities'
+    description: 'Allows users to edit agency entities.'
+'delete agency entities':
+    title: 'Delete agency entities'
+    description: 'Allows users to delete agency entities.'

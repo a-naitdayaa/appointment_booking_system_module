@@ -1,0 +1,296 @@
+<?php
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_entity_base_field_info().
+ *
+ * Adding Adviser fields
+ */
+function appointment_entity_base_field_info(EntityTypeInterface $entity_type): array
+{
+  $fields = [];
+
+  if($entity_type->id() === 'user') {
+    $fields['agency'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(new TranslatableMarkup('Agency'))
+      ->setDescription(t('The agency this adviser belongs to.'))
+      ->setRequired(false)
+      ->setSetting('target_type', 'agency_entity')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('form', [
+        'type'   => 'entity_reference_autocomplete',
+        'weight' => 10,
+      ]);;
+
+    $fields['working_hours'] = BaseFieldDefinition::create('integer')
+      ->setLabel(new TranslatableMarkup('Working hours'))
+      ->setDescription(t('The working hours this adviser belongs to.'))
+      ->setRequired(false)
+      ->setDisplayOptions('form', [
+        'type'   => 'number',
+        'weight' => 20,
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'number_integer',
+        'weight' => 20,
+      ])
+      ->setDisplayConfigurable('form', true)
+      ->setDisplayConfigurable('view', true);
+
+    $fields['specializations'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(new TranslatableMarkup('Specializations'))
+      ->setDescription(t('The specializations of this adviser.'))
+      ->setRequired(false)
+      ->setSetting('target_type', 'taxonomy_term')
+      ->setSetting('handler', 'default')
+      ->setSetting('handler_settings', [
+        'target_bundles' => [
+          'specializations' => 'appointment_type',
+        ],
+      ])
+      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+      ->setDisplayOptions('form', [
+        'type'   => 'entity_reference_autocomplete',
+        'weight' => 30,
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'entity_reference_label',
+        'weight' => 30,
+      ]);
+  }
+
+  return $fields;
+}
+
+/**
+ * @param $form
+ * @param FormStateInterface $form_state
+ * @param $form_id
+ * @return void
+ *
+ * implements hook_form_FORM_ID_alter() for the user form to show/hide adviser fields based on role.
+ */
+function appointment_form_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id): void
+{
+  $form['agency']['#states'] = [
+    'visible' => [
+      'input[name="roles[adviser]"]' => ['checked' => true],
+    ],
+  ];
+
+  $form['working_hours']['#states'] = [
+    'visible' => [
+      'input[name="roles[adviser]"]' => ['checked' => true],
+    ],
+  ];
+
+  $form['specializations']['#states'] = [
+    'visible' => [
+      'input[name="roles[adviser]"]' => ['checked' => true],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for the appointment_entity form.
+ *
+ * Disables the status field for users without "administer appointment entities" permission.
+ */
+
+function appointment_form_appointment_entity_form_alter(&$form, FormStateInterface $form_state, $form_id): void
+{
+  \Drupal::messenger()->addMessage('Form ID: ' . $form_id);
+
+  $user = \Drupal::currentUser();
+
+  if(!$user->hasPermission("administer appointment entities")){
+    $form['status']['#disabled'] = TRUE;
+  }
+}
+
+/**
+ * Builds the filter form with dropdowns.
+ */
+function appointment_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id): void
+{
+  \Drupal::messenger("")->addMessage('Form ID: ' . $form_id);
+  $view = $form_state->get('view');
+  \Drupal::messenger("")->addMessage('View ID: ' . $view->id());
+
+  if ($view->id() !== 'appointments' && $view->id() !== 'admin_appointments') {
+    return;
+  }
+
+  if (isset($form['combine'])) {
+    $form['combine']['#access'] = FALSE;
+  }
+
+  // ============================================================
+  // Adviser dropdown
+  // ============================================================
+  $advisers = \Drupal::entityTypeManager()
+    ->getStorage('user')
+    ->loadByProperties(['roles' => 'adviser', 'status' => 1]);
+
+  $adviser_options = ['' => t('- Any -')];
+  foreach ($advisers as $adviser) {
+    $adviser_options[$adviser->id()] = $adviser->getDisplayName();
+    //               ↑ uid as key → submitted to query_alter
+  }
+
+  $form['adviser'] = [
+    '#type'          => 'select',
+    '#title'         => t('Adviser'),
+    '#options'       => $adviser_options,
+    '#default_value' => '',
+    '#validated'     => TRUE,
+  ];
+
+  // ============================================================
+  // Agency dropdown
+  // ============================================================
+  $agencies = \Drupal::entityTypeManager()
+    ->getStorage('agency_entity')
+    ->loadMultiple();
+
+  $agency_options = ['' => t('- Any -')];
+  foreach ($agencies as $agency) {
+    $agency_options[$agency->id()] = $agency->label();
+    //               ↑ id as key → submitted to query_alter
+  }
+
+  $form['agency'] = [
+    '#type'          => 'select',
+    '#title'         => t('Agency'),
+    '#options'       => $agency_options,
+    '#default_value' => '',
+    '#validated'     => TRUE,
+  ];
+
+  // ============================================================
+  // Date picker
+  // ============================================================
+  $form['date'] = [
+    '#type'          => 'date',
+    '#title'         => t('Date'),
+    '#default_value' => '',
+  ];
+
+  $form['actions']['submit']['#value'] = t('Apply');
+}
+
+/**
+ * Applies filters to the SQL query.
+ */
+function appointment_views_query_alter(ViewExecutable $view, QueryPluginBase $query): void
+{
+  if ($view->id() !== 'appointments' && $view->id() !== 'admin_appointments') {
+    return;
+  }
+
+  $input = $view->getExposedInput();
+  $alias = $query->ensureTable('appointment_entity_data');
+
+  // ============================================================
+  // Adviser — dropdown
+  // ============================================================
+  if (!empty($input['adviser'])) {
+    $query->addWhere(0, $alias . '.adviser', $input['adviser'], '=');
+  }
+
+  // ============================================================
+  // Agency — dropdown
+  // ============================================================
+  if (!empty($input['agency'])) {
+    $query->addWhere(0, $alias . '.agency', $input['agency'], '=');
+  }
+
+  // ============================================================
+  // Date
+  // ============================================================
+  if (!empty($input['date'])) {
+    $query->addWhere(0, $alias . '.date', $input['date'] . 'T00:00:00', '>=');
+    $query->addWhere(0, $alias . '.date', $input['date'] . 'T23:59:59', '<=');
+  }
+}
+
+/**
+ * Implements hook_views_pre_render().
+ *
+ * Injects an "Export CSV" button above the appointments admin view.
+ */
+function appointment_views_pre_render(ViewExecutable $view): void
+{
+  if ($view->id() !== 'admin_appointments' || $view->current_display !== 'admin_appointments_view') {
+    return;
+  }
+
+  $url = Url::fromRoute('appointment.export_csv');
+
+  // Building the button and prepending it to the view
+  $view->attachment_before[] = [
+    '#type' => 'link',
+    '#title' => t('Export CSV'),
+    '#url' => $url,
+    '#attributes' => [
+      'class' => ['button', 'button--action', 'button--primary'],
+    ],
+  ];
+
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Registers the Twig template used by the confirmation step.
+ */
+function appointment_theme(): array {
+  return [
+    'appointment_booking_summary' => [
+      'template'  => 'appointment-booking-summary',
+      'variables' => [
+        'customer_name'  => NULL,
+        'customer_email' => NULL,
+        'customer_phone' => NULL,
+        'agency'         => NULL,
+        'specialization' => NULL,
+        'adviser'        => NULL,
+        'date'           => NULL,
+        'hour'           => NULL,
+      ],
+    ],
+
+    'appointment_appointment_summary' => [
+      'template' => 'appointment-appointment-summary',
+      'variables' => [
+        'date' => NULL,
+        'hour' => NULL,
+      ]
+    ],
+
+    'appointment_user_info_summary' => [
+      'template' => 'appointment-user-info-summary',
+      'variables' => [
+        'customer_name' => NULL,
+        'customer_email' => NULL,
+        'customer_phone' => NULL,
+      ]
+    ]
+  ];
+}
+
+
+
+

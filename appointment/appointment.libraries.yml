@@ -1,0 +1,4 @@
+customer-info-field:
+  css:
+    component:
+      css/customer-info-field.css: {}

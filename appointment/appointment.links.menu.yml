@@ -1,0 +1,27 @@
+appointment.admin_config:
+  title: 'Appointment'
+  description: 'Manage appointment entities'
+  route_name: appointment_entity.settings
+  parent: system.admin_config_development
+  weight: 10
+
+agency.admin_config:
+  title: 'Agencies'
+  description: 'Manage agency entities'
+  route_name: agency_entity.settings
+  parent: system.admin_config_development
+  weight: 11
+
+appointment.admin:
+  route_name: entity.appointment_entity.collection
+  title: 'Appointments'
+  description: 'Manage appointment entities'
+  parent: system.admin_structure
+  weight: 40
+
+agency.admin:
+  route_name: entity.agency_entity.collection
+  title: 'Agencies'
+  description: 'Manage agency entities'
+  parent: system.admin_structure
+  weight: 40
