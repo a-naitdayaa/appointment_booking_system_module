@@ -2,15 +2,36 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Appointment\Form;
+namespace Drupal\appointment\Form;
 
 
 use Drupal;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\appointment\Service\AppointmentMailer;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+
+
 
 class AppointmentBookingForm extends FormBase {
 
+  protected EntityTypeManagerInterface $entityTypeManager;
+  protected AppointmentMailer $mailer;
+
+  public function __construct(AppointmentMailer $mailer,
+                              EntityTypeManagerInterface $entityTypeManager)
+  {
+    $this->mailer = $mailer;
+    $this->entityTypeManager = $entityTypeManager;
+  }
+
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('appointment.mailer'),
+      $container->get('entity_type.manager'),
+    );
+  }
   public function getFormId() : string
   {
     return 'appointment_booking_form';
@@ -63,7 +84,6 @@ class AppointmentBookingForm extends FormBase {
     /**
      * step 2 - selecting agency specialization
      */
-
     if($step == 2){
       $form['step_2'] = [
         '#type' => 'container',
@@ -105,7 +125,6 @@ class AppointmentBookingForm extends FormBase {
     /**
      * step 3 - selecting an adviser
      */
-
     if($step == 3){
 
       $form['step_3'] = [
@@ -155,26 +174,41 @@ class AppointmentBookingForm extends FormBase {
       $form['step_4'] = [
         '#type'       => 'container',
         '#attributes' => ['class' => ['booking-step', 'is-active']],
+        '#attached'   => [
+          'library'       => ['appointment/fullcalendar'],
+          'drupalSettings' => [
+            'appointment' => [
+              'adviserId' => $form_state->get('selected_adviser_id'),
+              'bookedSlots' => $this->getBookedSlots($form_state->get('selected_adviser_id')),
+            ],
+          ],
+        ],
+      ];
+
+      $form['step_4']['calendar'] = [
+        '#type'       => 'container',
+        '#attributes' => ['id' => 'booking-calendar'],
       ];
 
       $form['step_4']['title'] = [
         '#markup' => '<h2 class="booking-step__title">Choose a date & time</h2>',
       ];
 
+      // Hidden fields to store the selected values.
       $form['step_4']['date'] = [
-        '#type'     => 'date',
-        '#title'    => $this->t('Date'),
-        '#required' => TRUE,
+        '#type'     => 'hidden',
         '#default_value' => $form_state->get('appointment_date') ?? '',
+        '#attributes' => ['class' => ['booking-date-value']],
       ];
 
       $form['step_4']['hour'] = [
-        '#type'    => 'select',
-        '#title'   => $this->t('Time'),
-        '#options' => $this->getTimeSlots(),
-        '#required' => TRUE,
+        '#type'    => 'hidden',
         '#default_value' => $form_state->get('appointment_hour') ?? '',
-        '#empty_option' => $this->t('— Select a time —'),
+        '#attributes' => ['class' => ['booking-hour-value']],
+      ];
+
+      $form['step_4']['selected_display'] = [
+        '#markup' => '<div id="booking-selected-slot" class="booking-selected-slot"></div>',
       ];
 
       $form['step_4']['nav'] = [
@@ -200,7 +234,7 @@ class AppointmentBookingForm extends FormBase {
 
 
     /**
-     * step 4 - customer information
+     * step 5 - customer information
      */
     if($step == 5) {
       $form['step_5'] = [
@@ -487,18 +521,6 @@ class AppointmentBookingForm extends FormBase {
     return $options;
   }
 
-  private function getAgencyLabel(mixed $agencyId): string {
-    if (!$agencyId) return '—';
-    $agency = \Drupal::entityTypeManager()->getStorage('agency_entity')->load($agencyId);
-    return $agency ? $agency->label() : '—';
-  }
-
-  private function getAdviserLabel(mixed $adviserId): string {
-    if (!$adviserId) return '—';
-    $adviser = \Drupal::entityTypeManager()->getStorage('user')->load($adviserId);
-    return $adviser ? $adviser->getDisplayName() : '—';
-  }
-
 
   /**
    * Fetches specializations associated with the selected agency
@@ -528,34 +550,6 @@ class AppointmentBookingForm extends FormBase {
     }
 
     return $specializations;
-  }
-
-  /**
-   * Fetches the label of a specialization term based on its ID.
-   *
-   * @param $specializationId
-   * @return string
-   */
-  private function getSpecializationLabel($specializationId) : string {
-    $term = \Drupal::entityTypeManager()
-      ->getStorage('taxonomy_term')
-      ->load($specializationId);
-
-    return $term ? $term->label() : '—';
-  }
-
-  /**
-   * Returns an array of available time slots for the time select element.
-   */
-  private function getTimeSlots(): array {
-    $slots = [];
-    for ($hour = 8; $hour < 18; $hour++) {
-      foreach (['00', '30'] as $minutes) {
-        $time = sprintf('%02d:%s', $hour, $minutes);
-        $slots[$time] = $time;
-      }
-    }
-    return $slots;
   }
 
   /**
@@ -620,14 +614,37 @@ class AppointmentBookingForm extends FormBase {
     $form_state->setRebuild(TRUE);
   }
 
+  private function getBookedSlots(mixed $adviserId): array {
+    if (!$adviserId) return [];
+
+    $ids = \Drupal::entityQuery('appointment_entity')
+      ->condition('adviser', $adviserId)
+      ->condition('status', 'canceled', '!=')
+      ->accessCheck(FALSE)
+      ->execute();
+
+    $appointments = \Drupal::entityTypeManager()
+      ->getStorage('appointment_entity')
+      ->loadMultiple($ids);
+
+    $slots = [];
+    foreach ($appointments as $appointment) {
+      $slots[] = $appointment->get('date')->value;
+    }
+
+    return $slots;
+  }
+
 
   public function submitForm(array &$form, FormStateInterface $form_state): void {
+    $transaction = \Drupal::database()->startTransaction();
+
     try {
       $date     = $form_state->get('appointment_date');
       $hour     = $form_state->get('appointment_hour');
       $datetime = $date . 'T' . $hour . ':00';
 
-      $appointment = \Drupal::entityTypeManager()
+      $appointment = $this->entityTypeManager
         ->getStorage('appointment_entity')
         ->create([
           'title'         => $this->t('Appointment - @date @hour', [
@@ -647,6 +664,21 @@ class AppointmentBookingForm extends FormBase {
         ]);
 
       $appointment->save();
+
+      $this->mailer->sendConfirmation(
+        to:            $form_state->get('customer_email'),
+        customer_name: $form_state->get('customer_name'),
+        date:          $form_state->get('appointment_date'),
+        hour:          $form_state->get('appointment_hour'),
+        agency:        $this->entityTypeManager
+        ->getStorage('agency_entity')
+        ->load($form_state->get('selected_agency_id'))
+        ?->label() ?? '—',
+        adviser:       $this->entityTypeManager
+        ->getStorage('user')
+        ->load($form_state->get('selected_adviser_id'))
+        ?->getDisplayName() ?? '—',
+      );
 
       $this->messenger()->addStatus($this->t(
         'Your appointment has been booked for @date at @hour.',

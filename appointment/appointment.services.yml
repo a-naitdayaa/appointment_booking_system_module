@@ -2,3 +2,10 @@ services:
   appointment.csv_exporter:
     class: Drupal\appointment\Service\AppointmentCsvExporter
     arguments: ['@entity_type.manager']
+
+  appointment.mailer:
+    class: Drupal\appointment\Service\AppointmentMailer
+    arguments:
+      - '@plugin.manager.mail'
+      - '@language_manager'
+      - '@logger.factory'

@@ -104,23 +104,6 @@ function appointment_form_user_form_alter(&$form, \Drupal\Core\Form\FormStateInt
 }
 
 /**
- * Implements hook_form_FORM_ID_alter() for the appointment_entity form.
- *
- * Disables the status field for users without "administer appointment entities" permission.
- */
-
-function appointment_form_appointment_entity_form_alter(&$form, FormStateInterface $form_state, $form_id): void
-{
-  \Drupal::messenger()->addMessage('Form ID: ' . $form_id);
-
-  $user = \Drupal::currentUser();
-
-  if(!$user->hasPermission("administer appointment entities")){
-    $form['status']['#disabled'] = TRUE;
-  }
-}
-
-/**
  * Builds the filter form with dropdowns.
  */
 function appointment_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id): void
@@ -147,7 +130,6 @@ function appointment_form_views_exposed_form_alter(&$form, FormStateInterface $f
   $adviser_options = ['' => t('- Any -')];
   foreach ($advisers as $adviser) {
     $adviser_options[$adviser->id()] = $adviser->getDisplayName();
-    //               ↑ uid as key → submitted to query_alter
   }
 
   $form['adviser'] = [
@@ -168,7 +150,6 @@ function appointment_form_views_exposed_form_alter(&$form, FormStateInterface $f
   $agency_options = ['' => t('- Any -')];
   foreach ($agencies as $agency) {
     $agency_options[$agency->id()] = $agency->label();
-    //               ↑ id as key → submitted to query_alter
   }
 
   $form['agency'] = [
@@ -248,7 +229,28 @@ function appointment_views_pre_render(ViewExecutable $view): void
       'class' => ['button', 'button--action', 'button--primary'],
     ],
   ];
+}
 
+/*
+ * implements hook_mail()
+ *
+ */
+function appointment_mail(string $key, array &$message, array $params): void {
+  switch ($key) {
+    case 'appointment_confirmation':
+      $message['subject'] = t('Appointment confirmation — @date at @hour', [
+        '@date' => $params['date'],
+        '@hour' => $params['hour'],
+      ]);
+      $message['body'][] = t('Dear @name,', ['@name' => $params['customer_name']]);
+      $message['body'][] = t('Your appointment has been successfully booked with the following details:');
+      $message['body'][] = t('Date: @date', ['@date' => $params['date']]);
+      $message['body'][] = t('Time: @hour', ['@hour' => $params['hour']]);
+      $message['body'][] = t('Agency: @agency', ['@agency' => $params['agency']]);
+      $message['body'][] = t('Adviser: @adviser', ['@adviser' => $params['adviser']]);
+      $message['body'][] = t('Thank you for booking with us.');
+      break;
+  }
 }
 
 /**

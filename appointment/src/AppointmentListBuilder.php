@@ -106,8 +106,6 @@ class AppointmentListBuilder extends EntityListBuilder {
       ?->get('specializations')->entity
       ?->label() ?? '-';
 
-
-
     return $row + parent::buildRow($entity);
   }
 }

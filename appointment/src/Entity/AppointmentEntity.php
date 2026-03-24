@@ -130,8 +130,12 @@ class AppointmentEntity extends ContentEntityBase implements AppointmentEntityIn
       ])
       ->setDisplayOptions('view', [
         'label' => 'above',
-        'type' => 'datetime_default',
+        'type' => 'datetime_custom',
         'weight' => 0,
+        'settings' => [
+          'date_format' => 'Y-m-d H:i',
+          'timezone_override' => 'UTC',
+        ],
       ])
       ->setDisplayConfigurable('form', true)
       ->setDisplayConfigurable('view', true);
