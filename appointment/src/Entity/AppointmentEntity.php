@@ -6,6 +6,7 @@ namespace Drupal\appointment\Entity;
 
 use Drupal\appointment\Access\AppointmentAccessControlHandler;
 use Drupal\appointment\AppointmentListBuilder;
+use Drupal\appointment\Form\AppointmentEditBookingForm;
 use Drupal\content_translation\ContentTranslationHandler;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -20,6 +21,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\EntityOwnerTrait;
 use Drupal\views\EntityViewsData;
+
 
 #[ContentEntityType(
   id: 'appointment_entity',
@@ -43,6 +45,7 @@ use Drupal\views\EntityViewsData;
     ],
     'form' => [
       'default' => ContentEntityForm::class,
+      'edit_booking' => AppointmentEditBookingForm::class,
       'delete'  => ContentEntityDeleteForm::class,
     ],
   ],

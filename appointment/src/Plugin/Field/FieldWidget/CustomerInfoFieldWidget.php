@@ -28,20 +28,21 @@ class CustomerInfoFieldWidget extends WidgetBase {
     $element['customer_info'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['customer-info-field']],
+      '#element_validate' => '::validateCustomerInfo',
     ];
 
     $element['customer_info']['name'] = [
       '#type'          => 'textfield',
       '#title'         => t('Name'),
       '#default_value' => $items[$delta]->name ?? '',
-      '#required'      => TRUE,
+      '#required'      => FALSE,
     ];
 
     $element['customer_info']['email'] = [
       '#type'          => 'email',
       '#title'         => t('Email'),
       '#default_value' => $items[$delta]->email ?? '',
-      '#required'      => TRUE,
+      '#required'      => FALSE,
     ];
 
     $element['customer_info']['phone'] = [
@@ -54,5 +55,40 @@ class CustomerInfoFieldWidget extends WidgetBase {
     $element['#attached']['library'] = ['appointment/customer_info_field_widget'];
 
     return $element;
+  }
+
+  /**
+   * Validate customer info fields.
+   */
+  public function validateCustomerInfo(array $element, FormStateInterface $form_state): void
+  {
+    $values = $form_state->getValue($element['#parents']);
+    $name   = $values['customer_info']['name'] ?? NULL;
+    $email  = $values['customer_info']['email'] ?? NULL;
+
+    if (empty($name)) {
+      $form_state->setError($element['customer_info']['name'], $this->t('Name is required.'));
+    }
+
+    if (empty($email)) {
+      $form_state->setError($element['customer_info']['email'], $this->t('Email is required.'));
+    }
+  }
+
+  /**
+   * @param array $values
+   * @param array $form
+   * @param FormStateInterface $form_state
+   * @return array
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array
+  {
+    foreach ($values as &$value) {
+      $value['name']  = $value['customer_info']['name'] ?? NULL;
+      $value['email'] = $value['customer_info']['email'] ?? NULL;
+      $value['phone'] = $value['customer_info']['phone'] ?? NULL;
+      unset($value['customer_info']);
+    }
+    return $values;
   }
 }

@@ -39,7 +39,7 @@ class CustomerInfoField extends FieldItemBase implements FieldItemInterface{
 
     $properties['phone'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Phone'))
-      ->setRequired(FALSE)
+      ->setRequired(TRUE)
       ->addConstraint('Regex', [
         'pattern' => '/^\+?[0-9\s\-()]+$/',
         'message' => 'Invalid phone number format.',

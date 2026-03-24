@@ -46,8 +46,6 @@ class AppointmentBookingForm extends FormBase {
     $form_state->set('step', $step);
 
 
-
-
     /**
      * Step 1 - selecting an agency
      */

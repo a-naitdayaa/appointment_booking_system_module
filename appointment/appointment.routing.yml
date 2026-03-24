@@ -22,6 +22,26 @@ appointment_entity.booking_form:
   requirements:
       _permission: 'add appointment entities'
 
+appointment_entity.edit_booking_form:
+  path: '/appointment/{appointment_entity}/edit-appointment'
+  defaults:
+      _entity_form: 'appointment_entity.edit_booking'
+      _title: 'Edit Appointment'
+  requirements:
+      _permission: 'edit appointment entities'
+  options:
+    parameters:
+      appointment_entity:
+        type: entity:appointment_entity
+
+appointment_entity.verify_phone:
+  path: '/appointment/{appointment_entity}/verify-phone'
+  defaults:
+      _form: 'Drupal\appointment\Form\AppointmentVerifyPhone'
+      _title: 'Verify Phone Number'
+  requirements:
+      _permission: 'edit appointment entities'
+
 # This route is used for the CSV export of appointments.
 appointment.export_csv:
   path: '/admin/structure/appointments/export-csv'
