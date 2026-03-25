@@ -178,6 +178,8 @@ class AppointmentBookingForm extends FormBase {
             'appointment' => [
               'adviserId' => $form_state->get('selected_adviser_id'),
               'bookedSlots' => $this->getBookedSlots($form_state->get('selected_adviser_id')),
+              'availableTime' => $this->getAdviserAvailableTime($form_state->get('selected_adviser_id')),
+              'adviserStartTime' => 9,
             ],
           ],
         ],
@@ -631,6 +633,16 @@ class AppointmentBookingForm extends FormBase {
     }
 
     return $slots;
+  }
+
+  public function getAdviserAvailableTime(mixed $adviserId) {
+    $adviser = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->load($adviserId);
+
+    $working_hours = $adviser->get('working_hours')->getValue()[0]['value'] ;
+
+    return $working_hours;
   }
 
 
