@@ -48,4 +48,71 @@ class AppointmentMailer {
       );
     }
   }
+
+  public function sendModificationConfirmation(
+    string $to,
+    string $customer_name,
+    string $date,
+    string $hour,
+    string $agency,
+    string $adviser,
+  ): void {
+    $langcode = $this->languageManager->getDefaultLanguage()->getId();
+
+    $result = $this->mailManager->mail(
+      module:   'appointment',
+      key:      'appointment_modification_confirmation',
+      to:       $to,
+      langcode: $langcode,
+      params:   [
+        'customer_name' => $customer_name,
+        'date'          => $date,
+        'hour'          => $hour,
+        'agency'        => $agency,
+        'adviser'       => $adviser,
+      ],
+      send: TRUE,
+    );
+
+    if (!$result['result']) {
+      $this->loggerFactory->get('appointment')->error(
+        'Failed to send modification email to @email',
+        ['@email' => $to]
+      );
+    }
+  }
+
+
+  public function sendCancellationConfirmation(
+    string $to,
+    string $customer_name,
+    string $date,
+    string $hour,
+    string $agency,
+    string $adviser,
+  ): void {
+    $langcode = $this->languageManager->getDefaultLanguage()->getId();
+
+    $result = $this->mailManager->mail(
+      module:   'appointment',
+      key:      'appointment_cancellation_confirmation',
+      to:       $to,
+      langcode: $langcode,
+      params:   [
+        'customer_name' => $customer_name,
+        'date'          => $date,
+        'hour'          => $hour,
+        'agency'        => $agency,
+        'adviser'       => $adviser,
+      ],
+      send: TRUE,
+    );
+
+    if (!$result['result']) {
+      $this->loggerFactory->get('appointment')->error(
+        'Failed to send cancellation email to @email',
+        ['@email' => $to]
+      );
+    }
+  }
 }

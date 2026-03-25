@@ -1,0 +1,70 @@
+id: appointments_import
+label: Appointments
+migration_group: appointment
+migration_dependencies:
+  required:
+      - agencies_import
+      - advisers_import
+
+source:
+  plugin: csv
+  path: 'modules/custom/appointment/data/appointments.csv'
+  header_row_count: 1
+  ids:
+    - ID
+  fields:
+    - name: ID
+      label: 'ID'
+    - name: title
+      label: 'Title'
+    - name: date
+      label: 'Date'
+    - name: agency_id
+      label: 'Agency ID'
+    - name: adviser_id
+      label: 'Adviser ID'
+    - name: specialization
+      label: 'Specialization'
+    - name: customer_name
+      label: 'Customer Name'
+    - name: customer_email
+      label: 'Customer Email'
+    - name: customer_phone
+      label: 'Customer Phone'
+    - name: status
+      label: 'Status'
+
+destination:
+  plugin: entity:appointment_entity
+
+process:
+  title: title
+  date: date
+  status: status
+
+  agency:
+    plugin: migration_lookup
+    migration: agencies_import
+    source: agency_id
+
+  adviser:
+    plugin: migration_lookup
+    migration: advisers_import
+    source: adviser_id
+
+  specialization:
+    plugin: entity_lookup
+    source: specialization
+    entity_type: taxonomy_term
+    value_key: name
+    bundle_key: vid
+    bundle: appointment_type
+    ignore_case: true
+    destination_field: tid
+
+  customer_info/phone: customer_phone
+  customer_info/email: customer_email
+  customer_info/name: customer_name
+
+
+

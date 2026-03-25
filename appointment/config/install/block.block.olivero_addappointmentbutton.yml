@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - appointment
+    - system
+  theme:
+    - olivero
+id: olivero_addappointmentbutton
+theme: olivero
+region: content
+weight: 0
+provider: null
+plugin: add_appointment_button
+settings:
+  id: add_appointment_button
+  label: 'Add Appointment Button'
+  label_display: '0'
+  provider: appointment
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: /appointments

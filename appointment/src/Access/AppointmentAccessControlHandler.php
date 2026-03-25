@@ -30,14 +30,28 @@ class AppointmentAccessControlHandler extends EntityAccessControlHandler {
           return AccessResult::forbidden();
         }
       case 'update':
-        if($account->hasPermission('edit appointment entities')) {
+        if ($account->hasPermission('edit appointment entities')) {
           return AccessResult::allowed();
         }
         else{
           return AccessResult::forbidden();
         }
+
       case 'delete':
         if($account->hasPermission('delete appointment entities')) {
+          return AccessResult::allowed();
+        }
+        else{
+          return AccessResult::forbidden();
+        }
+
+      case 'edit_booking':
+        if ($entity->get('status')->value === 'canceled' || $entity->get('status')->value === 'Canceled') {
+          return AccessResult::forbidden('Canceled appointments cannot be edited.')
+            ->addCacheableDependency($entity);
+        }
+
+        if ($account->hasPermission('edit appointment entities')) {
           return AccessResult::allowed();
         }
         else{

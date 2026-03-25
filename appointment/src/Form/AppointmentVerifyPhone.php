@@ -4,6 +4,7 @@ namespace Drupal\appointment\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 class AppointmentVerifyPhone extends FormBase {
 
@@ -19,7 +20,7 @@ class AppointmentVerifyPhone extends FormBase {
     $appointment = \Drupal::routeMatch()->getParameter('appointment_entity');
     $appointment_id = is_object($appointment) ? $appointment->id() : $appointment;
 
-
+    
 
     $form['phone'] = [
       '#type' => 'textfield',
@@ -65,6 +66,5 @@ class AppointmentVerifyPhone extends FormBase {
     else {
       $this->messenger()->addError($this->t('The phone number you entered does not match our records. Please try again.'));
     }
-
   }
 }

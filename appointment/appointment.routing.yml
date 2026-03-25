@@ -29,6 +29,7 @@ appointment_entity.edit_booking_form:
       _title: 'Edit Appointment'
   requirements:
       _permission: 'edit appointment entities'
+      _entity_access: 'appointment_entity.edit_booking'
   options:
     parameters:
       appointment_entity:

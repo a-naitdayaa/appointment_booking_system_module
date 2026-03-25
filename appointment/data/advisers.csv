@@ -1,0 +1,12 @@
+ID,name,mail,agency,working_hours,specializations
+1,Alice Martin,alice.martin@agency.com,1,8,Career Counseling|Employment Services
+2,Bob Henderson,bob.henderson@agency.com,1,6,Financial Advice|Legal Consultation
+3,Carol Zhang,carol.zhang@agency.com,2,4,Educational Guidance|Health Services
+4,David Okafor,david.okafor@agency.com,2,8,Immigration Services|Housing Assistance
+5,Emma Sullivan,emma.sullivan@agency.com,3,6,Career Counseling|Financial Advice|Health Services
+6,Frank Torres,frank.torres@agency.com,4,8,Legal Consultation|Employment Services
+7,Grace Kim,grace.kim@agency.com,5,4,Educational Guidance|Immigration Services|Housing Assistance
+8,Henry Patel,henry.patel@agency.com,6,4,Employment Services|Career Counseling
+9,Isabelle Nguyen,isabelle.nguyen@agency.com,7,5,Health Services|Financial Advice|Legal Consultation
+10,James O'Brien,james.obrien@agency.com,8,3,Housing Assistance|Immigration Services
+

@@ -1,0 +1,5 @@
+id: appointment
+label: 'Appointment'
+description: 'Migrations for the Appointment module.'
+source_type: CSV files
+

@@ -250,6 +250,35 @@ function appointment_mail(string $key, array &$message, array $params): void {
       $message['body'][] = t('Adviser: @adviser', ['@adviser' => $params['adviser']]);
       $message['body'][] = t('Thank you for booking with us.');
       break;
+
+    case 'appointment_modification_confirmation':
+      $message['subject'] = t('Appointment modification confirmation — @date at @hour', [
+        '@date' => $params['date'],
+        '@hour' => $params['hour'],
+      ]);
+      $message['body'][] = t('Dear @name,', ['@name' => $params['customer_name']]);
+      $message['body'][] = t('Your appointment has been successfully modified with the following details:');
+      $message['body'][] = t('Date: @date', ['@date' => $params['date']]);
+      $message['body'][] = t('Time: @hour', ['@hour' => $params['hour']]);
+      $message['body'][] = t('Agency: @agency', ['@agency' => $params['agency']]);
+      $message['body'][] = t('Adviser: @adviser', ['@adviser' => $params['adviser']]);
+      $message['body'][] = t('Thank you for booking with us.');
+      break;
+
+    case 'appointment_cancellation_confirmation':
+      $message['subject'] = t('Appointment Cancellation — @date at @hour', [
+        '@date' => $params['date'],
+        '@hour' => $params['hour'],
+      ]);
+      $message['body'][] = t('Dear @name,', ['@name' => $params['customer_name']]);
+      $message['body'][] = t('Your appointment scheduled for @date at @hour has been successfully canceled.', [
+        '@date' => $params['date'],
+        '@hour' => $params['hour'],
+      ]);
+      $message['body'][] = t('Agency: @agency', ['@agency' => $params['agency']]);
+      $message['body'][] = t('Adviser: @adviser', ['@adviser' => $params['adviser']]);
+      $message['body'][] = t('If this was a mistake, please contact us to reschedule.');
+      break;
   }
 }
 

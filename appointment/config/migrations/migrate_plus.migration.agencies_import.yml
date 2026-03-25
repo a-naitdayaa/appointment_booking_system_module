@@ -1,0 +1,33 @@
+id: agencies_import
+label: Agencies
+migration_group: appointment
+
+source:
+  plugin: csv
+  path: 'modules/custom/appointment/data/agencies.csv'
+  header_row_count: 1
+  ids:
+    - ID
+  fields:
+    - name: ID
+      label: 'ID'
+    - name: name
+      label: 'Name'
+    - name: address
+      label: 'Address'
+    - name: operating_hours
+      label: 'Operating Hours'
+    - name: contact_info
+      label: 'Contact Information'
+
+destination:
+    plugin: entity:agency_entity
+
+process:
+    name: name
+    address: address
+    operating_hours: operating_hours
+    contact_info: contact_info
+
+
+
