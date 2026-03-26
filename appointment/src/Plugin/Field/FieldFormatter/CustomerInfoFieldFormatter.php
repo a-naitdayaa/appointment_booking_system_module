@@ -23,10 +23,13 @@ class CustomerInfoFieldFormatter extends FormatterBase {
 
     foreach ($items as $delta => $item) {
       $elements[$delta] = [
-      '#theme' => 'customer_info',
-      '#name' => $item->name,
-      '#email' => $item->email,
-      '#phone' => $item->phone
+        '#theme' => 'customer_info',
+        '#name' => $item->name,
+        '#email' => $item->email,
+        '#phone' => $item->phone,
+        '#attached' => [
+          'library' => ['appointment/customer_info'],
+        ],
       ];
     }
     return $elements;

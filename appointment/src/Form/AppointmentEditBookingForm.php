@@ -49,6 +49,10 @@ class AppointmentEditBookingForm extends ContentEntityForm {
     $form['agency']['#disabled'] = TRUE;
     $form['adviser']['#disabled'] = TRUE;
     $form['title']['#disabled'] = TRUE;
+    //$form['customer_info']['field--type-customer-info-field'] = $appointment->get('customer_info')->first()->getName() ;
+
+    //dump($appointment->get('customer_info')->first()->getValue()["name"]);
+
 
     $form['actions']['cancel_appointment'] = [
       '#type' => "submit",
@@ -89,7 +93,7 @@ class AppointmentEditBookingForm extends ContentEntityForm {
 
     $this->mailer->sendModificationConfirmation(
       to:            $customer_info->email ?? '',
-      customer_name: $customer_info->name ?? '',
+      customer_name: $customer_info->getName() ?? '',
       date:          $date,
       hour:          $hour,
       agency:        $agency,
@@ -130,7 +134,7 @@ class AppointmentEditBookingForm extends ContentEntityForm {
 
     $this->mailer->sendCancellationConfirmation(
       to:            $customer_info->email ?? '',
-      customer_name: $customer_info->name ?? '',
+      customer_name: $customer_info->getName() ?? '',
       date:          $date,
       hour:          $hour,
       agency:        $agency,

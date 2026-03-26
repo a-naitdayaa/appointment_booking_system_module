@@ -1,0 +1,25 @@
+/* Outer card for display */
+.customer-info-wrapper {
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  padding: 12px 16px;
+  background-color: #fff;
+  margin-bottom: 15px;
+}
+
+/* Individual fields */
+.customer-field {
+  border: 1px solid #f0f0f0;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background-color: #fafafa;
+}
+
+/* make the field names bold */
+.customer-field strong {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 600;
+}

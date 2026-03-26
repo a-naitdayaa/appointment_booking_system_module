@@ -1,7 +1,12 @@
-customer-info-field:
+customer_info:
   css:
     component:
-      css/customer-info-field.css: {}
+      css/customer-info.css: {}
+
+customer_info_field_widget:
+  css:
+    component:
+      css/customer-info-field-widget.css: {}
 
 fullcalendar:
   js:

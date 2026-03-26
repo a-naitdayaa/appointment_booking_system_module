@@ -3,6 +3,8 @@
 
     attach(context, settings) {
       const el = context.querySelector('#booking-calendar');
+      console.log('element booking calendar: ', el);
+
       if (!el || el.dataset.calendarInit) return;
       el.dataset.calendarInit = true;
 
@@ -28,13 +30,16 @@
       const bookedEvents = bookedSlots.map(slot => ({
         start: slot,
         end: new Date(new Date(slot).getTime() + 30 * 60000).toISOString(),
-        display: 'background',
-        color: '#F76245',
+        title: 'Booked',
+        editable:        false,
+        selectable:      false,
+        backgroundColor: '#0000FF',
+        textColor:       '#ffffff',
       }));
 
 
       const businessHours = {
-        daysOfWeek: [1, 2, 3, 4, 5], // Monday - Friday
+        daysOfWeek: [1, 2, 3, 4, 5],
         startTime: startTimeStr,
         endTime: endTimeStr,
       }
@@ -52,7 +57,7 @@
         selectedConstraint: businessHours,
         eventConstraint: businessHours,
 
-        events:       bookedEvents,
+        events: bookedEvents,
 
         selectable: true,
 

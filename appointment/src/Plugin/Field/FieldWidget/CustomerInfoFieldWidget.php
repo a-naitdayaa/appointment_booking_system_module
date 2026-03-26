@@ -25,6 +25,9 @@ class CustomerInfoFieldWidget extends WidgetBase {
   ) : array
   {
 
+    $element['#title'] = $this->t('Customer Info');
+    $element['#title_display'] = 'before';
+
     $element['customer_info'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['customer-info-field']],
@@ -80,6 +83,9 @@ class CustomerInfoFieldWidget extends WidgetBase {
    * @param array $form
    * @param FormStateInterface $form_state
    * @return array
+   *
+   * This method is used to massage the form values before they are saved to the database.
+   * It takes the nested 'customer_info' array and flattens it into individual fields for name, email, and phone.
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array
   {

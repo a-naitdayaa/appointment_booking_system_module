@@ -105,6 +105,9 @@ function appointment_form_user_form_alter(&$form, \Drupal\Core\Form\FormStateInt
 
 /**
  * Builds the filter form with dropdowns.
+ *
+ * implements hook_form_FORM_ID_alter()
+ *
  */
 function appointment_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id): void
 {
@@ -318,7 +321,18 @@ function appointment_theme(): array {
         'customer_email' => NULL,
         'customer_phone' => NULL,
       ]
+    ],
+
+    'customer_info' => [
+      'template' => 'customer-info',
+      'variables' => [
+        'name' => NULL,
+        'email' => NULL,
+        'phone' => NULL,
+      ],
     ]
+
+
   ];
 }
 

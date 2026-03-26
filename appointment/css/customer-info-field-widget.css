@@ -1,0 +1,29 @@
+/* Outer wrapper: card effect */
+.customer-info-field {
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  background-color: #ffffff;
+}
+
+/* Each property input wrapper */
+.customer-widget-field {
+  border: 1px solid #f0f0f0;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background-color: #fafafa;
+}
+
+/* Inputs themselves for uniform sizing */
+.customer-widget-field input[type="text"],
+.customer-widget-field input[type="email"],
+.customer-widget-field input[type="tel"] {
+  border: none;
+  width: 100%;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  background-color: transparent;
+}

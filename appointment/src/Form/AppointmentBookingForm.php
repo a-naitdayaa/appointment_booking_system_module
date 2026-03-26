@@ -673,6 +673,8 @@ class AppointmentBookingForm extends FormBase {
           'status'        => 'pending',
         ]);
 
+      //dump($form_state->get('customer_name'));
+
       $appointment->save();
 
       $this->mailer->sendConfirmation(
@@ -681,13 +683,13 @@ class AppointmentBookingForm extends FormBase {
         date:          $form_state->get('appointment_date'),
         hour:          $form_state->get('appointment_hour'),
         agency:        $this->entityTypeManager
-        ->getStorage('agency_entity')
-        ->load($form_state->get('selected_agency_id'))
-        ?->label() ?? '—',
+                          ->getStorage('agency_entity')
+                          ->load($form_state->get('selected_agency_id'))
+                          ?->label() ?? '—',
         adviser:       $this->entityTypeManager
-        ->getStorage('user')
-        ->load($form_state->get('selected_adviser_id'))
-        ?->getDisplayName() ?? '—',
+                          ->getStorage('user')
+                          ->load($form_state->get('selected_adviser_id'))
+                          ?->getDisplayName() ?? '—',
       );
 
       $this->messenger()->addStatus($this->t(
