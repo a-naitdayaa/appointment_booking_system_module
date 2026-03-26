@@ -64,7 +64,10 @@ class AppointmentBookingForm extends FormBase {
         //'#empty_option'  => $this->t('— Select an agency —'),
         '#attributes' => ['class' => ['booking-agency-select']],
         '#required' => true,
+        '#default_value' => $form_state->get('selected_agency_id'),
       ];
+
+      dump($form_state->get('selected_agency_id'));
 
       $form['step_1']['nav'] = [
         '#type'       => 'container',
@@ -97,7 +100,10 @@ class AppointmentBookingForm extends FormBase {
         //'#empty_option'  => $this->t('— Select a specialization —'),
         '#attributes' => ['class' => ['booking-specialization-select']],
         '#required' => true,
+        '#default_value' => $form_state->get('selected_specialization_id'),
       ];
+
+      dump($form_state->get('selected_agency_id'));
 
       $form['step_2']['nav'] = [
         '#type'       => 'container',
@@ -141,6 +147,7 @@ class AppointmentBookingForm extends FormBase {
         //'#empty_option'  => $this->t('— Select an adviser —'),
         '#attributes' => ['class' => ['booking-adviser-select']],
         '#required' => true,
+        '#default_value' => $form_state->get('selected_adviser_id'),
       ];
 
       $form['step_3']['nav'] = [
@@ -257,6 +264,7 @@ class AppointmentBookingForm extends FormBase {
         '#default_value' => $form_state->get('customer_name') ?? '',
         '#required'      => TRUE,
         '#attributes'    => ['class' => ['booking-form__input']],
+
       ];
 
       $form['step_5']['customer_info']['email'] = [

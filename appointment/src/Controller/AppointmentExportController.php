@@ -4,7 +4,7 @@ namespace Drupal\appointment\Controller;
 
 use Drupal\appointment\Service\AppointmentCsvExporter;
 use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
@@ -26,15 +26,11 @@ class AppointmentExportController extends ControllerBase {
     );
   }
 
-  public function exportCsv(): Response
+  public function exportCsv() : RedirectResponse
   {
-    $csv = $this->csvExporter->exportCsv();
+    $this->csvExporter->startBatchExport();
 
-    $response = new Response($csv);
-    $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-    $response->headers->set('Content-Disposition', 'attachment; filename="appointments.csv"');
-
-    return $response;
+    return batch_process('admin/appointments');  // redirect url when finished
   }
 
 }
